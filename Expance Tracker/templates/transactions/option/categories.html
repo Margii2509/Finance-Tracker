@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2 style="margin-bottom: 2rem;">Manage Categories</h2>
+
+<div class="card" style="max-width: 600px; margin: 0 auto 2rem;">
+    <h3>Add New Category</h3>
+    <form method="POST" action="/add_category">
+        <div class="form-group">
+            <label for="name">Category Name</label>
+            <input type="text" name="name" id="name" required placeholder="e.g., Groceries, Rent, Bonus">
+        </div>
+        
+        <div class="form-group">
+            <label for="type">Type</label>
+            <select name="type" id="type" required>
+                <option value="expense">Expense</option>
+                <option value="income">Income</option>
+            </select>
+        </div>
+        
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Add Category</button>
+    </form>
+</div>
+
+<div class="card">
+    <h3>Existing Categories</h3>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 1.5rem;">
+        <div>
+            <h4 style="color: #38ef7d; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #38ef7d;">
+                💰 Income Categories
+            </h4>
+            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                {% for category in categories %}
+                    {% if category.type == 'income' %}
+                        <div style="background: #d4edda; padding: 0.75rem 1rem; border-radius: 6px; border-left: 4px solid #38ef7d;">
+                            <strong>{{ category.name }}</strong>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        
+        <div>
+            <h4 style="color: #ff6a00; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #ff6a00;">
+                💸 Expense Categories
+            </h4>
+            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                {% for category in categories %}
+                    {% if category.type == 'expense' %}
+                        <div style="background: #f8d7da; padding: 0.75rem 1rem; border-radius: 6px; border-left: 4px solid #ff6a00;">
+                            <strong>{{ category.name }}</strong>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    
+    <div style="margin-top: 2rem; padding-top: 1rem; border-top: 2px solid #e0e0e0;">
+        <p style="text-align: center; color: #6c757d;">
+            Total Categories: 
+            <strong>{{ categories|length }}</strong> 
+            (Income: <span class="income">{{ categories|selectattr('type', 'equalto', 'income')|list|length }}</span>, 
+            Expense: <span class="expense">{{ categories|selectattr('type', 'equalto', 'expense')|list|length }}</span>)
+        </p>
+    </div>
+</div>
+{% endblock %}

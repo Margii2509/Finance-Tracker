@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2 style="margin-bottom: 2rem;">Financial Reports</h2>
+
+<div class="card">
+    <h3>Monthly Trends (Last 6 Months)</h3>
+    <div style="overflow-x: auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Month</th>
+                    <th>Income</th>
+                    <th>Expenses</th>
+                    <th>Savings</th>
+                    <th>Savings Rate</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for month in monthly_data %}
+                <tr>
+                    <td><strong>{{ month.month }}</strong></td>
+                    <td class="income">₹{{ "%.2f"|format(month.income) }}</td>
+                    <td class="expense">₹{{ "%.2f"|format(month.expenses) }}</td>
+                    <td style="font-weight: 600; color: {% if month.income - month.expenses > 0 %}#38ef7d{% else %}#ff6a00{% endif %}">
+                        ₹{{ "%.2f"|format(month.income - month.expenses) }}
+                    </td>
+                    <td>
+                        {% if month.income > 0 %}
+                            {{ "%.1f"|format((month.income - month.expenses) / month.income * 100) }}%
+                        {% else %}
+                            0.0%
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem;">
+    <div class="card">
+        <h3>Expenses by Category</h3>
+        {% if expense_by_category %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Total</th>
+                        <th>Percentage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% set total_expenses = expense_by_category | sum(attribute='1') %}
+                    {% for category, total in expense_by_category %}
+                    <tr>
+                        <td>{{ category }}</td>
+                        <td class="expense">₹{{ "%.2f"|format(total) }}</td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <div style="flex: 1; background: #e0e0e0; height: 8px; border-radius: 4px; overflow: hidden;">
+                                    <div style="background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%); 
+                                                height: 100%; 
+                                                width: {{ (total / total_expenses * 100)|round(1) if total_expenses > 0 else 0 }}%;">
+                                    </div>
+                                </div>
+                                <span style="min-width: 45px; text-align: right; font-weight: 600;">
+                                    {{ "%.1f"|format(total / total_expenses * 100) if total_expenses > 0 else "0.0" }}%
+                                </span>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    <tr style="background: #f8f9fa; font-weight: bold;">
+                        <td>TOTAL</td>
+                        <td class="expense">₹{{ "%.2f"|format(total_expenses) }}</td>
+                        <td>100%</td>
+                    </tr>
+                </tbody>
+            </table>
+        {% else %}
+            <p style="text-align: center; color: #6c757d; padding: 2rem;">No expense data available</p>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <h3>Income by Category</h3>
+        {% if income_by_category %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Total</th>
+                        <th>Percentage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% set total_income = income_by_category | sum(attribute='1') %}
+                    {% for category, total in income_by_category %}
+                    <tr>
+                        <td>{{ category }}</td>
+                        <td class="income">₹{{ "%.2f"|format(total) }}</td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <div style="flex: 1; background: #e0e0e0; height: 8px; border-radius: 4px; overflow: hidden;">
+                                    <div style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); height: 100%; width: {{ (total / total_income * 100)|round(1) if total_income > 0 else 0 }}%;">
+                                    </div>
+                                </div>
+                                <span style="min-width: 45px; text-align: right; font-weight: 600;">
+                                    {{ "%.1f"|format(total / total_income * 100) if total_income > 0 else "0.0" }}%
+                                </span>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    <tr style="background: #f8f9fa; font-weight: bold;">
+                        <td>TOTAL</td>
+                        <td class="income">₹{{ "%.2f"|format(total_income) }}</td>
+                        <td>100%</td>
+                    </tr>
+                </tbody>
+            </table>
+        {% else %}
+            <p style="text-align: center; color: #6c757d; padding: 2rem;">No income data available</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card" style="max-width: 600px; margin: 0 auto;">
+    <h2>Add Transaction</h2>
+    <form method="POST">
+        <div class="form-group">
+            <label for="type">Transaction Type</label>
+            <select name="type" id="type" required onchange="filterCategories()">
+                <option value="expense">Expense</option>
+                <option value="income">Income</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="amount">Amount (₹)</label>
+            <input type="number" name="amount" id="amount" step="0.01" min="0.01" required placeholder="0.00">
+        </div>
+        
+        <div class="form-group">
+            <label for="category">Category</label>
+            <select name="category" id="category" required>
+                {% for category in categories %}
+                <option value="{{ category.id }}" data-type="{{ category.type }}">
+                    {{ category.name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea name="description" id="description" rows="3" placeholder="Add details about this transaction (optional)"></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="date">Date</label>
+            <input type="date" name="date" id="date" value="{{ today }}" required>
+        </div>
+        
+        <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+            <button type="submit" class="btn btn-primary" style="flex: 1;">Add Transaction</button>
+            <a href="/" class="btn" style="flex: 1; text-align: center; background: #6c757d; color: white;">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<script>
+function filterCategories() {
+    const type = document.getElementById('type').value;
+    const categorySelect = document.getElementById('category');
+    const options = categorySelect.options;
+    let firstValidOption = null;
+    
+    for (let i = 0; i < options.length; i++) {
+        const optionType = options[i].getAttribute('data-type');
+        if (optionType === type) {
+            options[i].style.display = 'block';
+            if (!firstValidOption) {
+                firstValidOption = options[i];
+            }
+        } else {
+            options[i].style.display = 'none';
+        }
+    }
+    
+    if (firstValidOption) {
+        categorySelect.value = firstValidOption.value;
+    }
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    filterCategories();
+});
+</script>
+{% endblock %}
